@@ -1,14 +1,14 @@
-# # 🎮 Console Micro-Survival Game in C++
+# 🎮 Console Micro-Survival Game in C++ (Refactored Version)
 
-A simple yet engaging console-based text survival game written in C++. The player must navigate a character through a dangerous grid filled with hidden mines and reach the exit point while keeping their Health Points (HP) above zero.
+A modular, console-based text survival game written in C++. The player must navigate a character through a dangerous grid filled with hidden traps and reach the exit point while keeping their Health Points (HP) above zero.
 
-This project demonstrates the core principles of procedural programming, working with 2D arrays, control flow structures (`switch-case`, `while`), and clean code refactoring by breaking game logic into independent functions.
+This updated version represents a complete architectural overhaul, shifting from global variables to **local state management** and **pass-by-reference (`&`)** mechanics.
 
 ---
 
 ## 🕹️ Gameplay & Map Elements
 
-The game board is a grid where each symbol represents a specific game element:
+The game board is a 2D grid where each symbol represents a specific game element:
 
 | Symbol | Meaning | Element Description |
 | :---: | :--- | :--- |
@@ -33,12 +33,15 @@ Character movement is handled via standard console input (type the character and
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Technical Highlights & Clean Code Architecture
 
-To run this game, you will need a C++ compiler (such as GCC, Clang, or MSVC) or an IDE (Visual Studio, VS Code, CLion).
+The codebase has been thoroughly refactored to comply with industry-standard production practices:
 
-1. Clone this repository or download the source code files.
-2. Open your terminal/command prompt in the project directory.
-3. Compile the code using the following command:
-   ```bash
-   g++ -O3 main.cpp -o survival_game
+* **Zero Global Variables:** All critical game states (`arr`, `hp`, `playerX`, `playerY`) are securely encapsulated inside the `main()` function scope.
+* **Pass-by-Reference (`&`):** Functions like `handleMovement()` and `stepOnCell()` utilize C++ references to modify the original game state directly in memory without costly and buggy data copying.
+* **Strict DRY Principle:** Redundant map-trigger checks within the execution blocks were extracted into an isolated `stepOnCell()` helper function.
+
+### Function Breakdown:
+* `drawMap(int arr[5][4], int hp)` — Renders the map and HUD by reading local parameters.
+* `checkGameStatus(int x, int y, int hp)` — Evaluates coordinates to trigger win/loss screens.
+* `handleMovement(char move, int arr[5][4], int &x, int &y, int &hp)` — Processes input and securely modifies coordinates and health using references.
