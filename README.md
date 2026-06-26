@@ -1,23 +1,23 @@
-# 🎮 Console Micro-Survival Game in C++ (Refactored Version)
+# 🎮 Console Procedural Survival Game in C++ (Vector Version)
 
-A modular, console-based text survival game written in C++. The player must navigate a character through a dangerous grid filled with hidden traps and reach the exit point while keeping their Health Points (HP) above zero.
+A dynamic, console-based text survival game written in C++. The player must navigate through a procedurally generated labyrinth filled with hidden traps, manage their Health Points (HP), and reach the exit point.
 
-This updated version represents a complete architectural overhaul, shifting from global variables to **local state management** and **pass-by-reference (`&`)** mechanics.
+This version represents a major milestone, shifting from static arrays to **dynamic memory management via `std::vector`** and introducing **procedural map generation**.
 
 ---
 
 ## 🕹️ Gameplay & Map Elements
 
-The game board is a 2D grid where each symbol represents a specific game element:
+The game board is dynamically generated based on user input. Each symbol represents a specific game element:
 
 | Symbol | Meaning | Element Description |
 | :---: | :--- | :--- |
-| **`P`** | **Player** | Your character. Starts at the top-left corner. |
-| **`E`** | **Exit** | The finish line. Reach this spot to win the game! |
-| **`#`** | **Wall** | An impassable obstacle. You cannot walk through walls. |
-| **`.`** | **Empty space**| A safe, empty cell you can move onto. |
-| **`X`** | **Mine** | A hidden trap! Stepping here deals **-35 HP**. |
-| **`+`** | **First Aid Kit**| A healing item. Restores **+35 HP** (capped at 100 HP). |
+| **`P`** | **Player** | Your character. Starts at the top-left corner `(0, 1)`. |
+| **`E`** | **Exit** | The finish line. Dynamically placed at the bottom-right. Reach it to win! |
+| **`#`** | **Wall** | Impassable obstacle generated with a 20% chance per cell. |
+| **`.`** | **Empty space**| A safe path you can move onto. |
+| **`X`** | **Mine** | Hidden trap (10% spawn chance). Stepping here deals **-35 HP**. |
+| **`+`** | **First Aid Kit**| Healing item (5% spawn chance). Restores **+35 HP** (capped at 100 HP). |
 
 ---
 
@@ -33,15 +33,11 @@ Character movement is handled via standard console input (type the character and
 
 ---
 
-## 🚀 Technical Highlights & Clean Code Architecture
+## 🚀 Technical Highlights & Advanced Architecture
 
-The codebase has been thoroughly refactored to comply with industry-standard production practices:
+The codebase has been refactored to meet production-level standards:
 
-* **Zero Global Variables:** All critical game states (`arr`, `hp`, `playerX`, `playerY`) are securely encapsulated inside the `main()` function scope.
-* **Pass-by-Reference (`&`):** Functions like `handleMovement()` and `stepOnCell()` utilize C++ references to modify the original game state directly in memory without costly and buggy data copying.
-* **Strict DRY Principle:** Redundant map-trigger checks within the execution blocks were extracted into an isolated `stepOnCell()` helper function.
-
-### Function Breakdown:
-* `drawMap(int arr[5][4], int hp)` — Renders the map and HUD by reading local parameters.
-* `checkGameStatus(int x, int y, int hp)` — Evaluates coordinates to trigger win/loss screens.
-* `handleMovement(char move, int arr[5][4], int &x, int &y, int &hp)` — Processes input and securely modifies coordinates and health using references.
+* **Dynamic Grid via STL Vectors:** Replaced raw arrays `int arr[5][4]` with `std::vector<std::vector<int>>`. The game no longer relies on hardcoded sizes and can scale to any dimensions (e.g., 10x10, 20x20) at runtime.
+* **Procedural Generation (`<ctime>`):** Map layout is seeded using `srand(time(0))`. Walls, mines, and health kits are distributed using a probability-based distribution algorithm, ensuring a unique map layout on every launch.
+* **Smart Boundary & Index Evaluation:** Out-of-bounds checks and win conditions dynamically adapt using the `.size()` and `.size() - 1` matrix calculations, preventing memory leaks and buffer overflows.
+* **Pass-by-Reference (`&`):** Large matrix data structures are passed by reference to avoid expensive memory copying operations between functions (`drawMap`, `handleMovement`, etc.).
