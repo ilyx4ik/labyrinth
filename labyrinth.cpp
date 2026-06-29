@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <ctime>
+#include <fstream>
 using namespace std;
 
 void drawMap(vector<vector<int>> &arr, int hp) {
@@ -20,6 +21,26 @@ void drawMap(vector<vector<int>> &arr, int hp) {
         }
         cout << endl; 
     }
+}
+
+void SaveMapToFile(vector<vector<int>> &arr) {
+    ofstream outFile("map.txt");
+    if(!outFile.is_open()){
+        cout << "Error: could`nt save the map!" << endl;
+        system("pause");
+        return;
+    }
+
+    for (int i = 0; i < arr.size(); i++) {
+        for (int j = 0; j < arr[0].size(); j++) {
+            outFile << arr[i][j] << " ";
+        }
+        outFile << endl;
+    }
+
+    outFile.close();
+    cout << "Map have been saved" << endl;
+    system("pause");
 }
 
 bool checkGameStatus(vector<vector<int>> &arr, int playerX, int playerY, int hp, bool hasKey, int exitX, int exitY) {
@@ -141,6 +162,11 @@ int main() {
             cout << "Exiting game." << endl;
             break;
         } 
+
+        if (move == 'p' || move == 'P') {
+            SaveMapToFile(arr);
+            continue;
+        }
 
         handleMovement(move, arr, playerX, playerY, hp, hasKey, exitX, exitY);
     }
