@@ -26,10 +26,12 @@ void drawMap(vector<vector<int>> &arr, int hp) {
 void SaveMapToFile(vector<vector<int>> &arr) {
     ofstream outFile("map.txt");
     if(!outFile.is_open()){
-        cout << "Error: could`nt save the map!" << endl;
+        cout << "Error: could'nt save the map!" << endl;
         system("pause");
         return;
     }
+
+    outFile << arr.size() << " " << arr[0].size() << endl;
 
     for (int i = 0; i < arr.size(); i++) {
         for (int j = 0; j < arr[0].size(); j++) {
@@ -41,6 +43,34 @@ void SaveMapToFile(vector<vector<int>> &arr) {
     outFile.close();
     cout << "Map have been saved" << endl;
     system("pause");
+}
+
+bool LoadMapFromFile (vector<vector<int>> &arr, int &playerX, int &playerY) {
+    ifstream inFile("map.txt");
+    if(!inFile.is_open()) {
+        cout << "Error: could'nt open the map!" << endl;
+        system("pause");
+        return false;
+    }
+
+    int fileRows = 0, fileCols = 0;
+
+    inFile >> fileRows >> fileCols;
+
+    arr.assign(fileRows, vector<int>(fileCols, 0));
+
+    for (int i = 0; i < arr.size(); i++) {
+        for(int j = 0; j < arr[0].size(); j++) {
+            inFile >> arr[i][j];
+
+            if (arr[i][j] == 2) {
+                playerX = i;
+                playerY = j;
+            }
+        }
+    }
+    inFile.close();
+    return true;
 }
 
 bool checkGameStatus(vector<vector<int>> &arr, int playerX, int playerY, int hp, bool hasKey, int exitX, int exitY) {
@@ -117,35 +147,55 @@ int main() {
     vector<vector<int>> arr(rows, vector<int>(cols, 0));
     srand(time(0));
     
-    int exitX = rows - 1;
-    int exitY = cols - 2;
-
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            if ((i == 0 && j == 1) || (i == 0 && j == 2) || (i == 1 && j == 1) ||
-                (i == exitX && j == exitY) || (i == exitX - 1 && j == exitY) || (i == exitX && j == exitY - 1)) {
-                continue;
-            }
-
-            int chance = rand() % 100;
-            if (chance < 20) {
-                arr[i][j] = 1;
-            } else if (chance < 25) {
-                arr[i][j] = 6;
-            } else if (chance < 35) {
-                arr[i][j] = 4;
-            } else if (chance < 40) {
-                arr[i][j] = 5;
-            } else {
-                arr[i][j] = 0;
-            }
-        }
-    }
-    
     int playerX = 0;
     int playerY = 1;
-    arr[playerX][playerY] = 2;
-    arr[exitX][exitY] = 3; 
+
+    char choice;
+    cout << "Do you want load the saved map? (y/n) ";
+    cin >> choice;
+
+    bool loaded = false;
+    if (choice == 'y' || choice == 'Y') {
+        loaded = LoadMapFromFile(arr, playerX, playerY);
+    }
+
+    if (!loaded) {
+        cout << "Generating new random map" << endl;
+        system("pause");
+
+        int tempExitX = rows - 1;
+        int tempExitY = cols - 2;
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if ((i == 0 && j == 1) || (i == 0 && j == 2) || (i == 1 && j == 1) ||
+                    (i == tempExitX && j == tempExitY) || (i == tempExitX - 1 && j == tempExitY) || (i == tempExitX && j == tempExitY - 1)) {
+                    continue;
+                }
+
+                int chance = rand() % 100;
+                if (chance < 20) {
+                    arr[i][j] = 1;
+                } else if (chance < 25) {
+                    arr[i][j] = 6;
+                } else if (chance < 35) {
+                    arr[i][j] = 4;
+                } else if (chance < 40) {
+                    arr[i][j] = 5;
+                } else {
+                    arr[i][j] = 0;
+                }
+            }
+        }
+        
+        playerX = 0;
+        playerY = 1;
+        arr[playerX][playerY] = 2;
+        arr[tempExitX][tempExitY] = 3; 
+    } 
+
+    int exitX = arr.size() - 1;
+    int exitY = arr[0].size() - 2;
 
     int hp = 100;
     char move;
